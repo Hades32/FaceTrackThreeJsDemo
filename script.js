@@ -49,7 +49,9 @@ const config = {
 };
 
 // Our input frames will come from here.
+/** @type {HTMLVideoElement} */
 const videoElement = document.getElementsByClassName("input_video")[0];
+/** @type {HTMLDivElement} */
 const faceContainer = document.getElementsByClassName("face-container")[0];
 // const canvasElement = document.getElementsByClassName("output_canvas")[0];
 // /** @type {CanvasRenderingContext2D} */
@@ -88,13 +90,26 @@ faceMesh.setOptions(solutionOptions);
 faceMesh.onResults(onResults);
 
 const render = async () => {
+  if (!videoElement.videoHeight || !videoElement.videoWidth) {
+    console.log("ignoring empty video frame");
+    return;
+  }
   await faceMesh.send({ image: videoElement });
   renderer.render(scene, camera);
   window.requestAnimationFrame(render);
 };
 
 const start = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  console.log("starting");
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "user" }, height: 720, width: 1200 },
+    });
+  } catch (ex) {
+    console.error("failed video", ex);
+    return;
+  }
   videoElement.srcObject = stream;
   await new Promise((r) => setTimeout(r, 10));
 
