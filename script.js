@@ -27,6 +27,7 @@ let camera = new THREE.PerspectiveCamera(
   solutionOptions.cameraNear,
   solutionOptions.cameraFar
 );
+let cameraDistance = 100;
 
 let theHat;
 loader.load(
@@ -73,7 +74,7 @@ function onResults(results) {
   const nosePosScreen = new THREE.Vector3(
     (nose.x - 0.5) * 2,
     (1 - nose.y - 0.5) * 2,
-    -1
+    Math.min(0, nose.z + 0.025)*30
   );
   const nosePos = nosePosScreen.unproject(camera);
   theHat.position.set(nosePos.x, nosePos.y, nosePos.z);
@@ -121,14 +122,12 @@ const start = async () => {
     solutionOptions.cameraNear,
     solutionOptions.cameraFar
   );
-  camera.position.set(
-    0,
-    0,
+  cameraDistance =
     (videoElement.clientWidth / 2) *
-      Math.tan(
-        (solutionOptions.cameraVerticalFovDegrees / 2 / 360) * 2 * Math.PI
-      )
-  );
+    Math.tan(
+      (solutionOptions.cameraVerticalFovDegrees / 2 / 360) * 2 * Math.PI
+    );
+  camera.position.set(0, 0, cameraDistance);
   scene.add(camera);
   renderer.domElement.classList.add("output_canvas");
   renderer.domElement.style = ""; // so we get size automatically instead of using their broken detection
