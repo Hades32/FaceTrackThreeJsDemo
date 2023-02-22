@@ -1,0 +1,99 @@
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.abs {
+  position: absolute;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+body {
+  bottom: 0;
+  font-family: "Titillium Web", sans-serif;
+  color: white;
+  margin: 0;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #596e73;
+}
+
+.face-container {
+  position: relative;
+  width: min-content;
+  align-self: center;
+}
+
+.input_video {
+  background-color: lightskyblue;
+  height: 75vh;
+}
+.input_video.selfie {
+  transform: scale(-1, 1);
+}
+
+.output_canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.control-panel {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+.loading {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min-content;
+  display: flex;
+  align-items: center;
+  backface-visibility: hidden;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 1s;
+}
+
+.loading .message {
+  font-size: x-large;
+}
+
+.loading .spinner {
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+  border: 32px solid #bebebe;
+  border-top: 32px solid #3498db;
+  border-radius: 50%;
+}
+
+.loaded .loading {
+  display: none;
+}
+
+.shoutout {
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  text-align: center;
+  font-size: 24px;
+  position: absolute;
+}
