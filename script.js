@@ -90,13 +90,14 @@ faceMesh.setOptions(solutionOptions);
 faceMesh.onResults(onResults);
 
 const render = async () => {
-  window.requestAnimationFrame(render);
   if (!videoElement.videoHeight || !videoElement.videoWidth) {
     console.log("ignoring empty video frame");
+    window.requestAnimationFrame(render);
     return;
   }
   await faceMesh.send({ image: videoElement });
   renderer.render(scene, camera);
+  window.requestAnimationFrame(render);
 };
 
 const start = async () => {
