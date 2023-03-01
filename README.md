@@ -1,6 +1,6 @@
 # FaceTrackThreeJsDemo
 
-Run with `http-server . -p 8000 -c-1` (assuming you did `npm install --global http-server` before) and you'll get a pirate hat floating above your nose.
+Run with `npm run dev` and you'll get a pirate hat floating above your nose.
 
 ## TODOs
 

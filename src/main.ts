@@ -1,7 +1,7 @@
-const mpFaceMesh = window;
+import { FaceMesh } from "@mediapipe/face_mesh";
 
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const solutionOptions = {
   cameraNear: 30,
@@ -29,7 +29,7 @@ let camera = new THREE.PerspectiveCamera(
 );
 let cameraDistance = 100;
 
-let theHat;
+let theHat: THREE.Group;
 loader.load(
   "pirate-hat.glb",
   (gltf) => {
@@ -40,28 +40,22 @@ loader.load(
   (error) => console.error(error)
 );
 
-const config = {
-  locateFile: (file) => {
-    return (
-      `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@` +
-      `${mpFaceMesh.VERSION}/${file}`
-    );
-  },
-};
-
 // Our input frames will come from here.
-/** @type {HTMLVideoElement} */
-const videoElement = document.getElementsByClassName("input_video")[0];
-/** @type {HTMLDivElement} */
-const faceContainer = document.getElementsByClassName("face-container")[0];
+const videoElement = document.getElementsByClassName("input_video")[0] as HTMLVideoElement;
+const faceContainer = document.getElementsByClassName("face-container")[0] as HTMLDivElement;
 // const canvasElement = document.getElementsByClassName("output_canvas")[0];
 // /** @type {CanvasRenderingContext2D} */
 // const canvasCtx = canvasElement.getContext("2d");
 
-const NOSE_POINT = 45;
-
 let firstResult = true;
-function onResults(results) {
+
+const faceMesh = new FaceMesh({
+  locateFile: (file) => {
+    return `./node_modules/@mediapipe/face_mesh/${file}`;
+  },
+});
+faceMesh.setOptions(solutionOptions);
+faceMesh.onResults(function onResults(results) {
   if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
     return;
   }
@@ -70,11 +64,17 @@ function onResults(results) {
     document.body.classList.add("loaded");
     firstResult = false;
   }
-  const nose = results.multiFaceLandmarks[0][NOSE_POINT];
+  // 0 // nose tip
+  // 10-11 // face middle, top to down
+  // 13-14 // mouth top-down
+  // 21 // left head
+  // 151-152 // another middle of face
+  // 251 // right head
+  const nose = results.multiFaceLandmarks[0][21];
   const nosePosScreen = new THREE.Vector3(
     (nose.x - 0.5) * 2,
     (1 - nose.y - 0.5) * 2,
-    Math.min(0, nose.z + 0.025)*30
+    Math.min(0, nose.z + 0.025) * 30
   );
   const nosePos = nosePosScreen.unproject(camera);
   theHat.position.set(nosePos.x, nosePos.y, nosePos.z);
@@ -83,12 +83,7 @@ function onResults(results) {
   //   (1 - nose.y) * videoElement.clientHeight,
   //   -nose.z * camera.position.z,
   // );
-}
-
-/** @type {FaceMesh} */
-const faceMesh = new mpFaceMesh.FaceMesh(config);
-faceMesh.setOptions(solutionOptions);
-faceMesh.onResults(onResults);
+});
 
 const render = async () => {
   if (!videoElement.videoHeight || !videoElement.videoWidth) {
@@ -130,7 +125,7 @@ const start = async () => {
   camera.position.set(0, 0, cameraDistance);
   scene.add(camera);
   renderer.domElement.classList.add("output_canvas");
-  renderer.domElement.style = ""; // so we get size automatically instead of using their broken detection
+  (renderer.domElement as any).style = ""; // so we get size automatically instead of using their broken detection
   faceContainer.appendChild(renderer.domElement);
 
   render();
